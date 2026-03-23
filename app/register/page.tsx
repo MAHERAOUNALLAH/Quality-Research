@@ -1,8 +1,11 @@
 "use client";
 import React, { useState } from "react";
 import "./register.css";
+import { useRouter } from "next/navigation";
 
 const Register: React.FC = () => {
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -33,11 +36,42 @@ const Register: React.FC = () => {
     setStep(2);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setTimeout(() => setLoading(false), 2000);
-  };
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError(null);
+
+  if (form.password !== form.confirmPassword) {
+    setError("Les mots de passe ne correspondent pas.");
+    return;
+  }
+  if (!form.agreeTerms) {
+    setError("Vous devez accepter les conditions.");
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setError(data?.error || "Erreur lors de l'inscription.");
+      return;
+    }
+
+    // ✅ succès -> rediriger vers login
+    router.push(`/login?registered=1&email=${encodeURIComponent(form.email)}`);
+  } catch {
+    setError("Erreur réseau. Réessayez.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="register-page">
@@ -143,7 +177,7 @@ const Register: React.FC = () => {
               </button>
             </form>
           )}
-
+          {error && <div className="field-error">{error}</div>}
           {/* Step 2 */}
           {step === 2 && (
             <form className="register-form" onSubmit={handleSubmit}>
