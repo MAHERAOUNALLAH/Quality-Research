@@ -47,7 +47,7 @@ export default function RootLayout({
               </Link>
 
               {/* Navigation Desktop */}
-              <nav className="hidden flex-1 items-center justify-center gap-1 whitespace-nowrap md:flex">
+              <nav className="hidden flex-1 items-center justify-center gap-1 whitespace-nowrap md:flex mr-10">
                 <NavLink href="/">Accueil</NavLink>
 
                 <NavDropdown label="À propos">
@@ -96,27 +96,27 @@ export default function RootLayout({
                 </NavDropdown>
 
                 <Link
-                  href="/contact"
-                  aria-label="Contact"
-                  title="Contact"
-                  className="group relative flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-primary"
-                >
-                  <svg
-                    className="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                    href="/contact"
+                    aria-label="Contact"
+                    title="Contact"
+                    className="group relative flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-primary"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    />
-                  </svg>
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      />
+                    </svg>
 
-                  <span className="absolute bottom-1 left-3 right-3 h-0.5 origin-left scale-x-0 bg-primary transition-transform duration-300 group-hover:scale-x-100" />
-                </Link>
+                    <span className="absolute bottom-1 left-3 right-3 h-0.5 origin-left scale-x-0 bg-primary transition-transform duration-300 group-hover:scale-x-100" />
+                  </Link>
               </nav>
 
               {/* Auth Buttons */}
