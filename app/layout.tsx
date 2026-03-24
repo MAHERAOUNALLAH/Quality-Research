@@ -1,6 +1,7 @@
 import Link from "next/link";
 import "./globals.css";
 import Image from "next/image";
+import NavbarAuth from "./components/NavbarAuth";
 
 export const metadata = {
   title: "Quality and Research - Excellence en Santé",
@@ -121,12 +122,7 @@ export default function RootLayout({
 
               {/* Auth Buttons */}
               <div className="hidden shrink-0 items-center gap-3 md:flex">
-                <Link href="/login" className="btn btn-outline px-5 py-2 text-sm">
-                  Connexion
-                </Link>
-                <Link href="/register" className="btn btn-primary px-5 py-2 text-sm">
-                  Inscription
-                </Link>
+                <NavbarAuth />
               </div>
 
               {/* Mobile Menu Button */}
