@@ -1,0 +1,110 @@
+:root {
+  --green-primary: #1a9e5c;
+  --green-dark: #0e7a43;
+  --green-light: #e8f8ef;
+  --navy: #0d2137;
+  --white: #ffffff;
+  --gray-100: #f7f9f8;
+  --gray-200: #eef1f0;
+  --shadow-card: 0 20px 60px rgba(14, 122, 67, 0.12), 0 4px 20px rgba(0, 0, 0, 0.06);
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --radius-pill: 100px;
+  --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.contact-page {
+  min-height: calc(100vh - 80px); /* Adjust based on navbar height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: linear-gradient(135deg, #f0faf5 0%, #e4f7ee 40%, #f7fcf9 100%);
+  padding: 40px 20px;
+}
+
+.blob-1 {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(26, 158, 92, 0.1) 0%, transparent 70%);
+  top: -100px;
+  right: -50px;
+  z-index: 0;
+}
+
+.contact-card {
+  position: relative;
+  z-index: 1;
+  background: var(--white);
+  width: 100%;
+  max-width: 480px;
+  padding: 40px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.contact-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.contact-header h1 {
+  font-family: 'Georgia', serif;
+  color: var(--navy);
+  font-size: 2.2rem;
+  margin-bottom: 5px;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-field {
+  padding: 14px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  background: var(--gray-100);
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--green-primary);
+  background: var(--white);
+  box-shadow: 0 0 0 4px var(--green-light);
+}
+
+.submit-btn {
+  background: var(--green-primary);
+  color: white;
+  padding: 16px;
+  border: none;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-top: 10px;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: var(--green-dark);
+  transform: translateY(-2px);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.status-msg {
+  text-align: center;
+  margin-top: 15px;
+  font-weight: 600;
+}
+
+.status-msg.success { color: #1a9e5c; }
+.status-msg.error { color: #d93025; }
