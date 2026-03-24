@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 type User = {
   _id: string;
@@ -13,6 +13,8 @@ type User = {
 
 export default function NavbarAuth() {
   const router = useRouter();
+  const pathname = usePathname();
+
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -37,15 +39,23 @@ export default function NavbarAuth() {
     };
 
     fetchMe();
-  }, []);
+  }, [pathname]); // important
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    });
-    router.refresh();
-    router.push("/");
+    try {
+      const res = await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!res.ok) return;
+
+      setUser(null); // mise à jour immédiate visuelle
+      router.replace("/");
+      router.refresh();
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   if (loading) return null;
@@ -54,7 +64,10 @@ export default function NavbarAuth() {
     return (
       <div className="flex items-center gap-3">
         <span>Bonjour, {user.fullName}</span>
-        <button onClick={handleLogout} className="btn btn-outline px-5 py-2 text-sm">
+        <button
+          onClick={handleLogout}
+          className="btn btn-outline px-5 py-2 text-sm"
+        >
           Déconnexion
         </button>
       </div>

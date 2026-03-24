@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 
 export async function POST() {
-  const cookieStore = await cookies();
-  cookieStore.delete("token");
-
-  return NextResponse.json({
+  const response = NextResponse.json({
     ok: true,
     message: "Déconnexion réussie",
   });
+
+  response.cookies.set("token", "", {
+    httpOnly: true,
+    expires: new Date(0),
+    path: "/", // très important
+  });
+
+  return response;
 }
