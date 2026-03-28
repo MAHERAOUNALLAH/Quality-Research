@@ -125,29 +125,32 @@ export default function Home() {
         </div>
       </section>
 
-      {/* NEWSLETTER SECTION */}
-      <section className="py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="bg-lightgreen rounded-3xl p-12 text-center">
-            <h3 className="font-display text-3xl font-bold text-gray-900 mb-4">
-              Restez Informé
-            </h3>
-            <p className="text-gray-600 mb-8 text-lg">
-              Inscrivez-vous à notre newsletter pour recevoir nos dernières actualités et événements
-            </p>
-            <form className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
-              <input 
-                type="email" 
-                placeholder="Votre adresse email"
-                className="flex-1 px-6 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <button type="submit" className="btn btn-primary px-8 py-3">
-                S'inscrire
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
+      {/* NEWSLETTER SECTION avec tes classes CSS */}
+<section className="py-20 bg-white">
+  <div className="max-w-4xl mx-auto px-6">
+    {/* Utilisation de .bg-lightgreen défini dans ton CSS */}
+    <div className="bg-lightgreen rounded-3xl p-8 md:p-12 text-center border border-gray-100 shadow-custom-sm">
+      <h3 className="font-display text-3xl font-bold text-gray-900 mb-4">
+        Restez Informé
+      </h3>
+      <p className="text-gray-600 mb-8 text-lg">
+        Inscrivez-vous à notre newsletter pour recevoir nos dernières actualités.
+      </p>
+      <form className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
+        <input 
+          type="email" 
+          placeholder="Votre adresse email"
+          className="flex-1 px-6 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary bg-white"
+          required
+        />
+        {/* Utilisation de .btn et .btn-primary définis dans ton CSS */}
+        <button type="submit" className="btn btn-primary">
+          S'inscrire
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
 
     </div>
   );
