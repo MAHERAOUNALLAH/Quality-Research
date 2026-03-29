@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 
@@ -14,9 +14,11 @@ type User = {
 export default function NavbarAuth() {
   const router = useRouter();
   const pathname = usePathname();
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const fetchMe = async () => {
@@ -39,7 +41,22 @@ export default function NavbarAuth() {
     };
 
     fetchMe();
-  }, [pathname]); // important
+  }, [pathname]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        menuRef.current &&
+        event.target instanceof Node &&
+        !menuRef.current.contains(event.target)
+      ) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -50,7 +67,8 @@ export default function NavbarAuth() {
 
       if (!res.ok) return;
 
-      setUser(null); // mise à jour immédiate visuelle
+      setUser(null);
+      setOpen(false);
       router.replace("/");
       router.refresh();
     } catch (error) {
@@ -62,20 +80,66 @@ export default function NavbarAuth() {
 
   if (user) {
     return (
-      <div className="flex items-center gap-3">
-        <span>Bonjour, {user.fullName}</span>
+      <div ref={menuRef} className="relative shrink-0">
         <button
-          onClick={handleLogout}
-          className="btn btn-outline px-5 py-2 text-sm"
+          onClick={() => setOpen((prev) => !prev)}
+          className="flex items-center gap-3 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-800 shadow-sm transition hover:border-green-500 hover:shadow-md"
         >
-          Déconnexion
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-green-600 text-sm font-bold text-white">
+            {user.fullName?.charAt(0).toUpperCase()}
+          </span>
+
+          <span className="hidden lg:block max-w-[140px] truncate">
+            {user.fullName}
+          </span>
+
+          <svg
+            className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`}
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              fillRule="evenodd"
+              d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.51a.75.75 0 01-1.08 0l-4.25-4.51a.75.75 0 01.02-1.06z"
+              clipRule="evenodd"
+            />
+          </svg>
         </button>
+
+        {open && (
+          <div className="absolute right-0 z-[9999] mt-3 w-56 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl">
+            <div className="border-b border-gray-100 px-4 py-3">
+              <p className="text-sm font-semibold text-gray-900">{user.fullName}</p>
+              <p className="truncate text-xs text-gray-500">{user.email}</p>
+            </div>
+
+            <div className="p-2">
+              {user.role === "admin" && (
+                <Link
+                  href="/admin"
+                  onClick={() => setOpen(false)}
+                  className="block rounded-xl px-3 py-2 text-sm text-gray-700 transition hover:bg-green-50 hover:text-green-700"
+                >
+                  Admin
+                </Link>
+              )}
+
+              <button
+                onClick={handleLogout}
+                className="block w-full rounded-xl px-3 py-2 text-left text-sm text-red-600 transition hover:bg-red-50"
+              >
+                Déconnexion
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3 shrink-0">
       <Link href="/login" className="btn btn-outline px-5 py-2 text-sm">
         Connexion
       </Link>
