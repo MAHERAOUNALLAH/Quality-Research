@@ -108,32 +108,52 @@ export default function NavbarAuth() {
         </button>
 
         {open && (
-          <div className="absolute right-0 z-[9999] mt-3 w-56 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl">
-            <div className="border-b border-gray-100 px-4 py-3">
-              <p className="text-sm font-semibold text-gray-900">{user.fullName}</p>
-              <p className="truncate text-xs text-gray-500">{user.email}</p>
-            </div>
+  <div className="absolute right-0 z-[9999] mt-3 w-56 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl">
+    <div className="border-b border-gray-100 px-4 py-3 bg-gray-50/50">
+      <p className="text-sm font-semibold text-gray-900 truncate">{user.fullName}</p>
+      <p className="truncate text-xs text-gray-500">{user.email}</p>
+    </div>
 
-            <div className="p-2">
-              {user.role === "admin" && (
-                <Link
-                  href="/admin"
-                  onClick={() => setOpen(false)}
-                  className="block rounded-xl px-3 py-2 text-sm text-gray-700 transition hover:bg-green-50 hover:text-green-700"
-                >
-                  Admin
-                </Link>
-              )}
+    <div className="p-2 space-y-1">
+      {/* NOUVEAU BOUTON : Mon Profil */}
+      <Link
+        href="/profile"
+        onClick={() => setOpen(false)}
+        className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-gray-700 transition hover:bg-green-50 hover:text-green-700"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+        Mon Profil
+      </Link>
 
-              <button
-                onClick={handleLogout}
-                className="block w-full rounded-xl px-3 py-2 text-left text-sm text-red-600 transition hover:bg-red-50"
-              >
-                Déconnexion
-              </button>
-            </div>
-          </div>
-        )}
+      {user.role === "admin" && (
+        <Link
+          href="/admin"
+          onClick={() => setOpen(false)}
+          className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-gray-700 transition hover:bg-green-50 hover:text-green-700"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          Admin
+        </Link>
+      )}
+
+      <div className="my-1 border-t border-gray-100"></div>
+
+      <button
+        onClick={handleLogout}
+        className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-red-600 transition hover:bg-red-50"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+        Déconnexion
+      </button>
+    </div>
+  </div>
+)}
       </div>
     );
   }
