@@ -21,7 +21,6 @@ export default function ProfilePage() {
     confirm: ''
   });
 
-  // Chargement des données via ton API sécurisée par token
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -127,7 +126,7 @@ export default function ProfilePage() {
           
           <button 
             onClick={() => {setActiveTab('public'); setMessage({type:'', text:''})}}
-            className={`w-full flex items-center justify-between p-5 rounded-2xl transition-all duration-300 font-bold ${activeTab === 'public' ? 'bg-[#10a37f] text-white shadow-xl shadow-green-100' : 'text-gray-400 hover:bg-gray-50 hover:text-black'}`}
+            className={`w-full flex items-center justify-between p-5 rounded-2xl transition-all duration-300 font-bold ${activeTab === 'public' ? 'bg-[#15803d] text-white shadow-xl shadow-green-100' : 'text-gray-400 hover:bg-gray-50 hover:text-black'}`}
           >
             <div className="flex items-center gap-4"><User size={22}/> Profil Public</div>
             <ChevronRight size={18}/>
@@ -135,7 +134,7 @@ export default function ProfilePage() {
 
           <button 
             onClick={() => {setActiveTab('security'); setMessage({type:'', text:''})}}
-            className={`w-full flex items-center justify-between p-5 rounded-2xl transition-all duration-300 font-bold ${activeTab === 'security' ? 'bg-[#10a37f] text-white shadow-xl shadow-green-100' : 'text-gray-400 hover:bg-gray-50 hover:text-black'}`}
+            className={`w-full flex items-center justify-between p-5 rounded-2xl transition-all duration-300 font-bold ${activeTab === 'security' ? 'bg-[#15803d] text-white shadow-xl shadow-green-100' : 'text-gray-400 hover:bg-gray-50 hover:text-black'}`}
           >
             <div className="flex items-center gap-4"><Lock size={22}/> Sécurité</div>
             <ChevronRight size={18}/>
@@ -160,12 +159,12 @@ export default function ProfilePage() {
                       {userData.profileImage ? (
                         <img src={userData.profileImage} className="w-full h-full object-cover" alt="Profile" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-[#10a37f] font-black text-4xl bg-green-50">
+                        <div className="w-full h-full flex items-center justify-center text-[#15803d] font-black text-4xl bg-green-50">
                           {userData.username?.charAt(0).toUpperCase() || "M"}
                         </div>
                       )}
                     </div>
-                    <label className="absolute -bottom-2 -right-2 bg-black text-white p-3 rounded-2xl cursor-pointer hover:bg-[#10a37f] transition-all shadow-xl">
+                    <label className="absolute -bottom-2 -right-2 bg-black text-white p-3 rounded-2xl cursor-pointer hover:bg-[#15803d] transition-all shadow-xl">
                       <Camera size={20} />
                       <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
                     </label>
@@ -183,7 +182,7 @@ export default function ProfilePage() {
                       type="text" 
                       value={userData.username} 
                       onChange={(e)=>setUserData({...userData, username: e.target.value})} 
-                      className="w-full p-5 bg-white border border-gray-100 rounded-3xl focus:border-[#10a37f] outline-none transition-all font-medium text-black"
+                      className="w-full p-5 bg-white border border-gray-100 rounded-3xl focus:border-[#15803d] outline-none transition-all font-medium text-black"
                     />
                   </div>
                   <div className="space-y-3">
@@ -192,7 +191,7 @@ export default function ProfilePage() {
                       type="email" 
                       value={userData.email} 
                       onChange={(e)=>setUserData({...userData, email: e.target.value})} 
-                      className="w-full p-5 bg-white border border-gray-100 rounded-3xl focus:border-[#10a37f] outline-none transition-all font-medium text-black"
+                      className="w-full p-5 bg-white border border-gray-100 rounded-3xl focus:border-[#15803d] outline-none transition-all font-medium text-black"
                     />
                   </div>
                 </div>
@@ -204,14 +203,14 @@ export default function ProfilePage() {
                     value={userData.bio} 
                     onChange={(e)=>setUserData({...userData, bio: e.target.value})} 
                     placeholder="Dites-en un peu plus sur vous..."
-                    className="w-full p-5 bg-white border border-gray-100 rounded-3xl focus:border-[#10a37f] outline-none transition-all font-medium text-black resize-none"
+                    className="w-full p-5 bg-white border border-gray-100 rounded-3xl focus:border-[#15803d] outline-none transition-all font-medium text-black resize-none"
                   ></textarea>
                 </div>
 
                 <button 
                   type="submit" 
                   disabled={loading}
-                  className="bg-[#10a37f] text-white px-10 py-5 rounded-[25px] font-black hover:bg-black transition-all flex items-center gap-3 shadow-xl shadow-green-100 disabled:opacity-50"
+                  className="bg-[#15803d] text-white px-10 py-5 rounded-[25px] font-black hover:bg-black transition-all flex items-center gap-3 shadow-xl shadow-green-100 disabled:opacity-50"
                 >
                   {loading ? <Loader2 className="animate-spin" /> : <Save size={22}/>}
                   {loading ? "Chargement..." : "Enregistrer le profil"}
@@ -219,9 +218,8 @@ export default function ProfilePage() {
               </form>
             ) : (
               <form onSubmit={handleUpdateSecurity} className="space-y-12 animate-in fade-in duration-700">
-                {/* En-tête de section style Contact */}
                 <div className="flex flex-col items-center text-center gap-4">
-                  <div className="w-16 h-16 bg-green-50 text-[#10a37f] rounded-2xl flex items-center justify-center border border-green-100 shadow-sm">
+                  <div className="w-16 h-16 bg-green-50 text-[#15803d] rounded-2xl flex items-center justify-center border border-green-100 shadow-sm">
                     <Lock size={28} strokeWidth={1.5} />
                   </div>
                   <div>
@@ -230,7 +228,6 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                {/* Formulaire épuré */}
                 <div className="max-w-xl mx-auto space-y-6">
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-gray-600 ml-1">Ancien mot de passe</label>
@@ -240,7 +237,7 @@ export default function ProfilePage() {
                       value={passwords.old} 
                       onChange={(e)=>setPasswords({...passwords, old: e.target.value})} 
                       placeholder="Votre mot de passe actuel"
-                      className="w-full p-5 bg-white border border-gray-100 rounded-2xl focus:border-[#10a37f] focus:ring-4 focus:ring-green-50/50 outline-none transition-all font-medium text-black placeholder:text-gray-300"
+                      className="w-full p-5 bg-white border border-gray-100 rounded-2xl focus:border-[#15803d] focus:ring-4 focus:ring-green-50/50 outline-none transition-all font-medium text-black placeholder:text-gray-300"
                     />
                   </div>
 
@@ -253,7 +250,7 @@ export default function ProfilePage() {
                         value={passwords.new} 
                         onChange={(e)=>setPasswords({...passwords, new: e.target.value})} 
                         placeholder="Nouveau mot de passe"
-                        className="w-full p-5 bg-white border border-gray-100 rounded-2xl focus:border-[#10a37f] focus:ring-4 focus:ring-green-50/50 outline-none transition-all font-medium text-black placeholder:text-gray-300"
+                        className="w-full p-5 bg-white border border-gray-100 rounded-2xl focus:border-[#15803d] focus:ring-4 focus:ring-green-50/50 outline-none transition-all font-medium text-black placeholder:text-gray-300"
                       />
                     </div>
 
@@ -265,18 +262,17 @@ export default function ProfilePage() {
                         value={passwords.confirm} 
                         onChange={(e)=>setPasswords({...passwords, confirm: e.target.value})} 
                         placeholder="Répétez le nouveau mot de passe"
-                        className="w-full p-5 bg-white border border-gray-100 rounded-2xl focus:border-[#10a37f] focus:ring-4 focus:ring-green-50/50 outline-none transition-all font-medium text-black placeholder:text-gray-300"
+                        className="w-full p-5 bg-white border border-gray-100 rounded-2xl focus:border-[#15803d] focus:ring-4 focus:ring-green-50/50 outline-none transition-all font-medium text-black placeholder:text-gray-300"
                       />
                     </div>
                   </div>
                 </div>
 
-                {/* Bouton style Contact */}
                 <div className="max-w-xl mx-auto pt-4">
                   <button 
                     type="submit" 
                     disabled={loading}
-                    className="w-full bg-[#10a37f] text-white py-5 rounded-full font-black hover:bg-black hover:shadow-2xl hover:shadow-green-100 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.97]"
+                    className="w-full bg-[#15803d] text-white py-5 rounded-full font-black hover:bg-black hover:shadow-2xl hover:shadow-green-100 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.97]"
                   >
                     {loading ? <Loader2 className="animate-spin" size={22} /> : <CheckCircle size={22}/>}
                     {loading ? "Mise à jour..." : "Enregistrer les modifications"}
