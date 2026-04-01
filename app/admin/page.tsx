@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 type UserItem = {
@@ -39,13 +40,8 @@ export default function AdminPage() {
           credentials: "include",
           cache: "no-store",
         });
-
         const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.message || "Erreur chargement utilisateurs");
-        }
-
+        if (!res.ok) throw new Error(data.message || "Erreur chargement utilisateurs");
         setUsers(data.users || []);
       } catch (error: any) {
         setErrorUsers(error.message || "Erreur chargement utilisateurs");
@@ -60,13 +56,8 @@ export default function AdminPage() {
           credentials: "include",
           cache: "no-store",
         });
-
         const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.message || "Erreur chargement messages");
-        }
-
+        if (!res.ok) throw new Error(data.message || "Erreur chargement messages");
         setMessages(data.messages || []);
       } catch (error: any) {
         setErrorMessages(error.message || "Erreur chargement messages");
@@ -85,22 +76,48 @@ export default function AdminPage() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Tableau de bord Admin</h1>
           <p className="mt-2 text-sm text-gray-600">
-            Gestion des utilisateurs et des messages de contact.
+            Gestion des utilisateurs, messages et contenu du site.
           </p>
         </div>
 
+        {/* Stats */}
         <div className="grid gap-6 md:grid-cols-2">
           <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
             <p className="text-sm text-gray-500">Utilisateurs</p>
             <p className="mt-2 text-3xl font-bold text-green-600">{users.length}</p>
           </div>
-
           <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
             <p className="text-sm text-gray-500">Messages</p>
             <p className="mt-2 text-3xl font-bold text-green-600">{messages.length}</p>
           </div>
         </div>
 
+        {/* Quick-access content cards */}
+        <div>
+          <h2 className="mb-4 text-lg font-semibold text-gray-900">Gestion du contenu</h2>
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+            {[
+              { label: "Categories", href: "/admin/categories", color: "#8b5cf6" },
+              { label: "Events", href: "/admin/events", color: "#0ea5e9" },
+              { label: "Articles", href: "/admin/articles", color: "#10b981" },
+              { label: "Messages", href: "/admin/messages", color: "#f59e0b" },
+              { label: "Calls", href: "/admin/calls", color: "#ef4444" },
+              { label: "Reports", href: "/admin/reports", color: "#6366f1" },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100 no-underline block hover:shadow-md transition-shadow"
+                style={{ borderTop: `4px solid ${item.color}` }}
+              >
+                <div className="font-semibold text-gray-800 text-sm">{item.label}</div>
+                <div className="text-xs text-gray-400 mt-1">Manage →</div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Users table */}
         <section className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-xl font-semibold text-gray-900">Liste des utilisateurs</h2>
@@ -127,7 +144,6 @@ export default function AdminPage() {
                   {users.map((user) => {
                     const displayName =
                       user.fullName || `${user.prenom || ""} ${user.nom || ""}`.trim() || "Sans nom";
-
                     return (
                       <tr key={user._id} className="bg-gray-50 text-sm text-gray-700">
                         <td className="rounded-l-xl px-4 py-3 font-medium">{displayName}</td>
@@ -153,6 +169,7 @@ export default function AdminPage() {
           )}
         </section>
 
+        {/* Contact messages */}
         <section className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-xl font-semibold text-gray-900">Messages de contact</h2>
@@ -178,20 +195,15 @@ export default function AdminPage() {
                         {msg.name} — {msg.email}
                       </p>
                     </div>
-
                     <span className="inline-flex w-fit rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
                       {msg.status || "unread"}
                     </span>
                   </div>
-
                   <p className="mt-4 whitespace-pre-wrap text-sm text-gray-700">
                     {msg.message}
                   </p>
-
                   <p className="mt-3 text-xs text-gray-400">
-                    {msg.createdAt
-                      ? new Date(msg.createdAt).toLocaleString("fr-FR")
-                      : ""}
+                    {msg.createdAt ? new Date(msg.createdAt).toLocaleString("fr-FR") : ""}
                   </p>
                 </div>
               ))}
