@@ -89,7 +89,7 @@ export default function NavbarAuth() {
             {user.fullName?.charAt(0).toUpperCase()}
           </span>
 
-          <span className="hidden lg:block max-w-[140px] truncate">
+          <span className="hidden max-w-[140px] truncate lg:block">
             {user.fullName}
           </span>
 
@@ -110,11 +110,21 @@ export default function NavbarAuth() {
         {open && (
           <div className="absolute right-0 z-[9999] mt-3 w-56 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl">
             <div className="border-b border-gray-100 px-4 py-3">
-              <p className="text-sm font-semibold text-gray-900">{user.fullName}</p>
+              <p className="text-sm font-semibold text-gray-900">
+                {user.fullName}
+              </p>
               <p className="truncate text-xs text-gray-500">{user.email}</p>
             </div>
 
             <div className="p-2">
+              <Link
+                href="/profile"
+                onClick={() => setOpen(false)}
+                className="block rounded-xl px-3 py-2 text-sm text-gray-700 transition hover:bg-green-50 hover:text-green-700"
+              >
+                Profil
+              </Link>
+
               {user.role === "admin" && (
                 <Link
                   href="/admin"
