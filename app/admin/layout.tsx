@@ -7,18 +7,17 @@ import { verifyToken } from "@/lib/auth";
 import { getDb } from "@/lib/mongodb";
 
 const NAV_LINKS = [
-  { href: "/admin", label: "Dashboard", icon: "📊" },
-  { href: "/admin/categories", label: "Catégories", icon: "📂" },
-  { href: "/admin/events", label: "Événements", icon: "📅" },
-  { href: "/admin/articles", label: "Articles", icon: "📰" },
-  { href: "/admin/messages", label: "Messages", icon: "✉️" },
-  { href: "/admin/calls", label: "Appels", icon: "📣" },
-  { href: "/admin/projects", label: "Projets", icon: "🔬" },
-  { href: "/admin/reports", label: "Rapports", icon: "📊" },
-  { href: "/admin/team", label: "Équipe", icon: "👥" },
-  { href: "/admin/partners", label: "Partenaires", icon: "🤝" },
-  { href: "/admin/resources", label: "Ressources", icon: "📚" },
-  { href: "/admin/formations", label: "Formations", icon: "🎓" },
+  { href: "/admin",             label: "Dashboard",    icon: "📊" },
+  { href: "/admin/categories",  label: "Catégories",   icon: "📂" },
+  { href: "/admin/events",      label: "Événements",   icon: "📅" },
+  { href: "/admin/articles",    label: "Articles",     icon: "📰" },
+  { href: "/admin/messages",    label: "Messages",     icon: "✉️"  },
+  { href: "/admin/calls",       label: "Appels",       icon: "📣" },
+  { href: "/admin/projects",    label: "Projets",      icon: "🔬" },
+  { href: "/admin/team",        label: "Équipe",       icon: "👥" },
+  { href: "/admin/partners",    label: "Partenaires",  icon: "🤝" },
+  { href: "/admin/resources",   label: "Ressources",   icon: "📚" },
+  { href: "/admin/formations",  label: "Formations",   icon: "🎓" },
 ];
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
@@ -51,12 +50,12 @@ export default async function AdminLayout({ children }: { children: ReactNode })
               </Link>
             ))}
           </nav>
-          <div className="p-4 border-t border-white/10 space-y-1">
-            <Link href="/" className="flex items-center gap-2 text-xs text-slate-400 hover:text-white transition py-1">
+          <div className="p-4 border-t border-white/10">
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-xs text-slate-400 hover:text-white transition py-1"
+            >
               ← Voir le site
-            </Link>
-            <Link href="/api/seed?force=1" className="flex items-center gap-2 text-xs text-slate-400 hover:text-amber-300 transition py-1">
-              🌱 Re-seeder la DB
             </Link>
           </div>
         </aside>
