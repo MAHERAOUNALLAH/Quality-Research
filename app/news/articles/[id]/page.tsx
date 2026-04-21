@@ -97,26 +97,44 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
 
       {/* Content */}
       <div className="mx-auto max-w-4xl px-6 py-10">
+        {/* Back button (top) */}
+        <div className="mb-6">
+          <Link
+            href="/news/articles"
+            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 hover:text-primary transition-all"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Retour aux articles
+          </Link>
+        </div>
+
         <div className="grid gap-10 lg:grid-cols-[1fr_280px]">
           {/* Main content */}
           <article className="rounded-2xl bg-white border border-gray-100 p-8 shadow-sm">
             <div className="prose prose-gray max-w-none">
               {paragraphs.map((p, i) => (
-                <p key={i} className="mb-5 text-gray-700 leading-relaxed text-base">{p}</p>
+                <p key={i} className="mb-6 text-gray-700 text-base" style={{ lineHeight: "1.9" }}>{p}</p>
               ))}
             </div>
 
             {/* Footer */}
-            <div className="mt-8 border-t border-gray-100 pt-6 flex items-center justify-between flex-wrap gap-4">
+            <div className="mt-10 border-t border-gray-100 pt-6 flex items-center justify-between flex-wrap gap-4">
               <div className="text-sm text-gray-500">
                 Publié le{" "}
                 <span className="font-medium text-gray-700">
                   {new Date(displayDate).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
                 </span>
               </div>
-              <Link href="/news/articles"
-                className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
-                ← Retour aux articles
+              <Link
+                href="/news/articles"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary/90 transition-all shadow-sm"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Retour aux articles
               </Link>
             </div>
           </article>

@@ -81,7 +81,6 @@ export default function RootLayout({
                 </NavDropdown>
 
                 <NavLink href="/projects">Projets et collaboration</NavLink>
-                <NavLink href="/reports">Evénements</NavLink>
                 <NavLink href="/school">Ressources</NavLink>
 
                 <NavDropdown label="Juridique">

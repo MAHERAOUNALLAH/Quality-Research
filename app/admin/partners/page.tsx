@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Partner = {
   _id: string;
@@ -13,17 +13,27 @@ type Partner = {
 };
 
 const initial = { name: "", type: "", country: "", logo: "", website: "", order: 0 };
-
 const PARTNER_TYPES = ["Université", "Institution", "Organisation internationale", "Académique", "Scientifique", "Réseau", "Technique", "Autre"];
+const INPUT_CLS = "w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition";
+
+async function uploadFile(file: File, folder: string): Promise<string> {
+  const fd = new FormData(); fd.append("file", file); fd.append("folder", folder);
+  const res = await fetch("/api/upload", { method: "POST", body: fd });
+  const data = await res.json();
+  if (!res.ok || !data.ok) throw new Error(data.message || "Upload échoué");
+  return data.url as string;
+}
 
 export default function AdminPartnersPage() {
   const [items, setItems] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(initial);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   async function load() {
     setLoading(true);
@@ -31,16 +41,13 @@ export default function AdminPartnersPage() {
       const res = await fetch("/api/partners", { cache: "no-store" });
       const data = await res.json();
       setItems(Array.isArray(data) ? data : data.items || []);
-    } catch {
-      setError("Erreur de chargement.");
-    } finally {
-      setLoading(false);
-    }
+    } catch { setError("Erreur de chargement."); }
+    finally { setLoading(false); }
   }
 
   useEffect(() => { load(); }, []);
 
-  function reset() { setEditingId(null); setForm(initial); setError(""); setSuccess(""); }
+  function reset() { setEditingId(null); setForm(initial); setError(""); setSuccess(""); if (fileRef.current) fileRef.current.value = ""; }
 
   function startEdit(item: Partner) {
     setEditingId(item._id);
@@ -48,8 +55,14 @@ export default function AdminPartnersPage() {
     setError(""); setSuccess("");
   }
 
-  function set<K extends keyof typeof initial>(k: K, v: (typeof initial)[K]) {
-    setForm((p) => ({ ...p, [k]: v }));
+  function set<K extends keyof typeof initial>(k: K, v: (typeof initial)[K]) { setForm((p) => ({ ...p, [k]: v })); }
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]; if (!file) return;
+    setUploading(true); setError("");
+    try { set("logo", await uploadFile(file, "partners")); }
+    catch (err) { setError(err instanceof Error ? err.message : "Upload échoué"); }
+    finally { setUploading(false); }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -63,9 +76,8 @@ export default function AdminPartnersPage() {
       if (!res.ok || !data.ok) throw new Error(data.message || "Erreur");
       setSuccess(editingId ? "Partenaire mis à jour." : "Partenaire ajouté.");
       reset(); await load();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur");
-    } finally { setSaving(false); }
+    } catch (err) { setError(err instanceof Error ? err.message : "Erreur"); }
+    finally { setSaving(false); }
   }
 
   async function handleDelete(id: string) {
@@ -92,36 +104,40 @@ export default function AdminPartnersPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Nom *</label>
-              <input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Nom de l'organisation"
-                className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20" />
+              <input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Nom de l'organisation" className={INPUT_CLS} />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-              <select value={form.type} onChange={(e) => set("type", e.target.value)}
-                className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20">
+              <select value={form.type} onChange={(e) => set("type", e.target.value)} className={INPUT_CLS}>
                 <option value="">Sélectionner…</option>
                 {PARTNER_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Pays</label>
-              <input value={form.country} onChange={(e) => set("country", e.target.value)} placeholder="Tunisie"
-                className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20" />
+              <input value={form.country} onChange={(e) => set("country", e.target.value)} placeholder="Tunisie" className={INPUT_CLS} />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Site web</label>
-              <input value={form.website} onChange={(e) => set("website", e.target.value)} placeholder="https://…"
-                className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20" />
+              <input value={form.website} onChange={(e) => set("website", e.target.value)} placeholder="https://…" className={INPUT_CLS} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">URL Logo</label>
-              <input value={form.logo} onChange={(e) => set("logo", e.target.value)} placeholder="/uploads/partners/logo.png"
-                className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20" />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Logo</label>
+              <div className="flex gap-2 items-center">
+                <input type="file" ref={fileRef} accept="image/*" onChange={handleFileChange} className="hidden" />
+                <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
+                  className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 transition flex-shrink-0">
+                  {uploading ? "Upload…" : "📷 Choisir"}
+                </button>
+                <input value={form.logo} onChange={(e) => set("logo", e.target.value)} placeholder="/uploads/partners/logo.png" className={INPUT_CLS} />
+              </div>
+              {form.logo && (
+                <img src={form.logo} alt="Logo preview" className="mt-2 h-12 w-auto object-contain rounded border border-gray-100 bg-gray-50 p-1" />
+              )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Ordre</label>
-              <input type="number" value={form.order} onChange={(e) => set("order", Number(e.target.value))}
-                className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20" />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Ordre d'affichage</label>
+              <input type="number" value={form.order} onChange={(e) => set("order", Number(e.target.value))} className={INPUT_CLS} />
             </div>
           </div>
 
@@ -129,7 +145,7 @@ export default function AdminPartnersPage() {
           {success && <p className="text-sm text-green-700">{success}</p>}
 
           <div className="flex gap-3">
-            <button type="submit" disabled={saving}
+            <button type="submit" disabled={saving || uploading}
               className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50 hover:bg-primary/90 transition">
               {saving ? "Enregistrement…" : editingId ? "Mettre à jour" : "Ajouter"}
             </button>
@@ -157,15 +173,11 @@ export default function AdminPartnersPage() {
           <div className="space-y-3">
             {items.map((item) => (
               <div key={item._id} className="flex items-center gap-4 rounded-xl border border-gray-100 p-4 hover:bg-gray-50 transition">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-lightgreen">
-                  {item.logo ? (
-                    <img src={item.logo} alt={item.name} className="h-8 w-8 object-contain" />
-                  ) : (
-                    <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5" />
-                    </svg>
-                  )}
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-lightgreen overflow-hidden">
+                  {item.logo
+                    ? <img src={item.logo} alt={item.name} className="h-10 w-10 object-contain" />
+                    : <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5" /></svg>
+                  }
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-gray-900 truncate">{item.name}</p>
@@ -173,13 +185,9 @@ export default function AdminPartnersPage() {
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
                   <button onClick={() => startEdit(item)}
-                    className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium hover:bg-gray-100 transition">
-                    Modifier
-                  </button>
+                    className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium hover:bg-gray-100 transition">Modifier</button>
                   <button onClick={() => handleDelete(item._id)}
-                    className="rounded-lg border border-red-100 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 transition">
-                    Supprimer
-                  </button>
+                    className="rounded-lg border border-red-100 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 transition">Supprimer</button>
                 </div>
               </div>
             ))}
