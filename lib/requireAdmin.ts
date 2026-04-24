@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { ObjectId } from "mongodb";
 import { getDb } from "@/lib/mongodb";
-import { verifyToken } from "@/lib/auth";
+import { isAdminRole, verifyToken } from "@/lib/auth";
 
 /**
  * Returns the user document if the request is from an admin/superadmin.
@@ -20,7 +20,7 @@ export async function requireAdmin() {
       _id: new ObjectId(payload.sub),
     });
 
-    if (!user || (user.role !== "admin" && user.role !== "superadmin")) return null;
+    if (!user || !isAdminRole(user.role)) return null;
     return user;
   } catch {
     return null;

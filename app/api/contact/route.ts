@@ -4,7 +4,7 @@ import { ObjectId } from "mongodb";
 import nodemailer from "nodemailer";
 
 import { getDb } from "@/lib/mongodb";
-import { verifyToken } from "@/lib/auth";
+import { isAdminRole, verifyToken } from "@/lib/auth";
 
 export async function GET() {
   try {
@@ -25,7 +25,7 @@ export async function GET() {
       _id: new ObjectId(payload.sub),
     });
 
-    if (!user || (user.role !== "admin" && user.role !== "superadmin")) {
+    if (!user || !isAdminRole(user.role)) {
       return NextResponse.json(
         { ok: false, message: "Accès refusé" },
         { status: 403 }

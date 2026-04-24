@@ -11,6 +11,11 @@ type User = {
   role: string;
 };
 
+function canAccessAdmin(role: string) {
+  const normalized = role.trim().toLowerCase();
+  return normalized === "admin" || normalized === "superadmin";
+}
+
 export default function NavbarAuth() {
   const router = useRouter();
   const pathname = usePathname();
@@ -125,7 +130,7 @@ export default function NavbarAuth() {
                 Profil
               </Link>
 
-              {user.role === "admin" && (
+              {canAccessAdmin(user.role) && (
                 <Link
                   href="/admin"
                   onClick={() => setOpen(false)}

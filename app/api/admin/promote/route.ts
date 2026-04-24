@@ -1,18 +1,18 @@
 import { NextResponse } from "next/server";
-import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
-import { cookies } from "next/headers";
+import { getDb } from "@/lib/mongodb";
+import { isSuperAdminRole } from "@/lib/auth";
+import { requireAdmin } from "@/lib/requireAdmin";
+
+const ALLOWED_ROLES = new Set(["USER", "ADMIN", "admin", "superadmin"]);
 
 export async function PATCH(request: Request) {
   try {
-    // FIX: Added 'await' before cookies() for Next.js 15+ compatibility
-    const cookieStore = await cookies();
-    const userRole = cookieStore.get("user-role")?.value;
+    const admin = await requireAdmin();
 
-    // Security check: Only superadmin can promote others
-    if (userRole !== "superadmin") {
+    if (!admin || !isSuperAdminRole(admin.role)) {
       return NextResponse.json(
-        { error: "Accès refusé. Autorisation Super Admin requise." },
+        { error: "Acces refuse. Autorisation Super Admin requise." },
         { status: 403 }
       );
     }
@@ -21,15 +21,26 @@ export async function PATCH(request: Request) {
 
     if (!userId || !newRole) {
       return NextResponse.json(
-        { error: "Données manquantes (ID ou Rôle)." },
+        { error: "Donnees manquantes (ID ou role)." },
         { status: 400 }
       );
     }
 
-    const client = await clientPromise;
-    const db = client.db("qualityandresearch");
+    if (!ObjectId.isValid(userId)) {
+      return NextResponse.json(
+        { error: "ID utilisateur invalide." },
+        { status: 400 }
+      );
+    }
 
-    // Update the 'users' collection with the new role
+    if (!ALLOWED_ROLES.has(newRole)) {
+      return NextResponse.json(
+        { error: "Role invalide." },
+        { status: 400 }
+      );
+    }
+
+    const db = await getDb();
     const result = await db.collection("users").updateOne(
       { _id: new ObjectId(userId) },
       { $set: { role: newRole } }
@@ -37,19 +48,18 @@ export async function PATCH(request: Request) {
 
     if (result.matchedCount === 0) {
       return NextResponse.json(
-        { error: "Utilisateur non trouvé." },
+        { error: "Utilisateur non trouve." },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ 
-      message: `Succès : Nouveau rôle est ${newRole}` 
+    return NextResponse.json({
+      message: `Succes : nouveau role ${newRole}`,
     });
-
   } catch (error) {
-    console.error("Erreur de promotion:", error);
+    console.error("PATCH /api/admin/promote error:", error);
     return NextResponse.json(
-      { error: "Erreur serveur lors de la mise à jour." },
+      { error: "Erreur serveur lors de la mise a jour." },
       { status: 500 }
     );
   }
