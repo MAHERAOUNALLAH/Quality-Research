@@ -1,42 +1,24 @@
+// app/api/admin/users/route.ts
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/mongodb";
-import { requireAdmin } from "@/lib/requireAdmin";
+import clientPromise from "@/lib/mongodb"; // Assure-toi que le chemin est correct
 
 export async function GET() {
   try {
-    const admin = await requireAdmin();
+    const client = await clientPromise;
+    const db = client.db("qualityandresearch");
 
-    if (!admin) {
-      return NextResponse.json(
-        { ok: false, message: "Accès refusé" },
-        { status: 403 }
-      );
-    }
-
-    const db = await getDb();
-
+    // On récupère tous les utilisateurs de la collection "user"
+    // On exclut les mots de passe par sécurité ({ password: 0 })
     const users = await db
       .collection("users")
-      .find(
-        {},
-        {
-          projection: {
-            passwordHash: 0,
-            password: 0,
-          },
-        }
-      )
-      .sort({ createdAt: -1 })
+      .find({}, { projection: { password: 0 } }) 
       .toArray();
 
-    return NextResponse.json({
-      ok: true,
-      users,
-    });
+    return NextResponse.json(users);
   } catch (error) {
-    console.error("ADMIN_USERS_ERROR:", error);
+    console.error("Erreur API Users:", error);
     return NextResponse.json(
-      { ok: false, message: "Erreur serveur" },
+      { error: "Impossible de récupérer les utilisateurs" },
       { status: 500 }
     );
   }
