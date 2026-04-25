@@ -28,6 +28,7 @@ export async function POST(req: Request) {
       description: body.description || "",
       date: body.date ? new Date(body.date) : new Date(),
       lieu: body.lieu || "",
+      prix: Number(body.prix) || 0,
       categoryId: body.categoryId || "",
       image: body.image || "",
       createdAt: new Date(),

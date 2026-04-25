@@ -28,7 +28,7 @@ type NavLink = {
 };
 
 const NAV_LINKS: NavLink[] = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin", label: "Tableau de bord", icon: LayoutDashboard },
   { href: "/admin/categories", label: "Categories", icon: FolderTree },
   { href: "/admin/events", label: "Evenements", icon: CalendarDays },
   { href: "/admin/articles", label: "Articles", icon: Newspaper },
@@ -57,24 +57,24 @@ export default function AdminSidebar({
   const pathname = usePathname();
 
   return (
-    <aside className="sticky top-0 flex h-screen w-72 flex-shrink-0 flex-col border-r border-emerald-100 bg-white text-slate-800 shadow-[12px_0_35px_rgba(15,118,72,0.08)]">
-      <div className="relative overflow-hidden border-b border-emerald-100 px-5 py-6">
-        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-500 via-green-400 to-teal-500" />
+    <aside className="sticky top-0 flex h-screen w-72 flex-shrink-0 flex-col border-r border-green-100 bg-white text-gray-900 shadow-[12px_0_35px_rgba(22,163,74,0.08)]">
+      <div className="relative overflow-hidden border-b border-green-100 px-5 py-6">
+        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-primary" />
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-lg shadow-emerald-200">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-green-100">
             <ShieldCheck className="h-6 w-6" aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <div className="text-lg font-bold tracking-tight text-slate-950">
-              Admin Panel
+            <div className="text-xl font-bold tracking-tight text-gray-950">
+              Espace Admin
             </div>
-            <div className="mt-0.5 truncate text-xs font-medium text-slate-500">
+            <div className="mt-1 truncate text-sm font-medium text-gray-600">
               {email}
             </div>
           </div>
         </div>
 
-        <div className="mt-5 inline-flex items-center rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700">
+        <div className="mt-5 inline-flex items-center rounded-full border border-green-100 bg-lightgreen px-3 py-1 text-xs font-bold uppercase tracking-wide text-primary">
           {role || "admin"}
         </div>
       </div>
@@ -90,10 +90,10 @@ export default function AdminSidebar({
                 key={link.href}
                 href={link.href}
                 className={[
-                  "group relative flex min-h-11 items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-all",
+                  "group relative flex min-h-11 items-center gap-3 rounded-2xl px-3 py-2.5 text-base font-bold transition-all",
                   active
-                    ? "bg-emerald-600 text-white shadow-lg shadow-emerald-100"
-                    : "text-slate-600 hover:bg-emerald-50 hover:text-emerald-700",
+                    ? "bg-primary text-white shadow-lg shadow-green-100"
+                    : "text-gray-800 hover:bg-lightgreen hover:text-primary",
                 ].join(" ")}
               >
                 <span
@@ -101,7 +101,7 @@ export default function AdminSidebar({
                     "flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl transition-colors",
                     active
                       ? "bg-white/18 text-white"
-                      : "bg-slate-50 text-slate-500 group-hover:bg-white group-hover:text-emerald-700",
+                      : "bg-gray-50 text-gray-600 group-hover:bg-white group-hover:text-primary",
                   ].join(" ")}
                 >
                   <Icon className="h-4.5 w-4.5" aria-hidden="true" />
@@ -122,12 +122,12 @@ export default function AdminSidebar({
         </div>
       </nav>
 
-      <div className="border-t border-emerald-100 p-4">
+      <div className="border-t border-green-100 p-4">
         <Link
           href="/"
-          className="flex min-h-11 items-center gap-3 rounded-2xl border border-emerald-100 bg-emerald-50 px-3 py-2.5 text-sm font-semibold text-emerald-700 transition hover:border-emerald-200 hover:bg-emerald-100"
+          className="flex min-h-11 items-center gap-3 rounded-2xl border border-green-100 bg-lightgreen px-3 py-2.5 text-base font-bold text-primary transition hover:border-primary hover:bg-white"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-emerald-700">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-primary">
             <Home className="h-4.5 w-4.5" aria-hidden="true" />
           </span>
           Voir le site

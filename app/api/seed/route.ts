@@ -20,6 +20,9 @@ export async function GET(req: Request) {
       db.collection("categories").deleteMany({}),
       db.collection("articles").deleteMany({}),
       db.collection("events").deleteMany({}),
+      db.collection("eventFavorites").deleteMany({}),
+      db.collection("eventCart").deleteMany({}),
+      db.collection("payments").deleteMany({}),
       db.collection("calls").deleteMany({}),
       db.collection("projects").deleteMany({}),
       db.collection("reports").deleteMany({}),
@@ -52,9 +55,9 @@ export async function GET(req: Request) {
     ]);
 
     await db.collection("events").insertMany([
-      { _id: new ObjectId(), titre: "Congrès International Qualité & Recherche", description: "Un congrès dédié à l'excellence en santé, aux innovations méthodologiques et aux expériences terrain.\n\nLe programme comprend des conférences plénières, des ateliers pratiques, des sessions de communication orale et affichée.", date: new Date("2026-05-22T08:00:00.000Z"), lieu: "Tunis, Tunisie", image: "", categoryId: catId("Événements"), published: true, createdAt: now, updatedAt: now },
-      { _id: new ObjectId(), titre: "Hackathon Santé Digitale 2026", description: "48 heures de co-création autour des solutions numériques pour la santé publique et les parcours patients.\n\nDes équipes pluridisciplinaires travailleront ensemble pour concevoir des prototypes innovants.", date: new Date("2026-06-14T09:00:00.000Z"), lieu: "Sousse, Tunisie", image: "", categoryId: catId("Hackathons"), published: true, createdAt: now, updatedAt: now },
-      { _id: new ObjectId(), titre: "Journée Méthodologie de la Recherche", description: "Ateliers et conférences destinés aux étudiants, chercheurs et professionnels de santé souhaitant renforcer leurs compétences en méthodologie de recherche.", date: new Date("2026-04-18T08:30:00.000Z"), lieu: "Sfax, Tunisie", image: "", categoryId: catId("Formation"), published: true, createdAt: now, updatedAt: now },
+      { _id: new ObjectId(), titre: "Congrès International Qualité & Recherche", description: "Un congrès dédié à l'excellence en santé, aux innovations méthodologiques et aux expériences terrain.\n\nLe programme comprend des conférences plénières, des ateliers pratiques, des sessions de communication orale et affichée.", date: new Date("2026-05-22T08:00:00.000Z"), lieu: "Tunis, Tunisie", prix: 180, image: "", categoryId: catId("Événements"), published: true, createdAt: now, updatedAt: now },
+      { _id: new ObjectId(), titre: "Hackathon Santé Digitale 2026", description: "48 heures de co-création autour des solutions numériques pour la santé publique et les parcours patients.\n\nDes équipes pluridisciplinaires travailleront ensemble pour concevoir des prototypes innovants.", date: new Date("2026-06-14T09:00:00.000Z"), lieu: "Sousse, Tunisie", prix: 50, image: "", categoryId: catId("Hackathons"), published: true, createdAt: now, updatedAt: now },
+      { _id: new ObjectId(), titre: "Journée Méthodologie de la Recherche", description: "Ateliers et conférences destinés aux étudiants, chercheurs et professionnels de santé souhaitant renforcer leurs compétences en méthodologie de recherche.", date: new Date("2026-04-18T08:30:00.000Z"), lieu: "Sfax, Tunisie", prix: 0, image: "", categoryId: catId("Formation"), published: true, createdAt: now, updatedAt: now },
     ]);
 
     await db.collection("calls").insertMany([

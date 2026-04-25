@@ -2,6 +2,7 @@ import Link from "next/link";
 import "./globals.css";
 import Image from "next/image";
 import NavbarAuth from "./components/NavbarAuth";
+import { HandCoins, Heart, Mail, ShoppingCart } from "lucide-react";
 
 export const metadata = {
   title: "Quality and Research - Excellence en Santé",
@@ -95,28 +96,18 @@ export default function RootLayout({
                   </DropdownItem>
                 </NavDropdown>
 
-                <Link
-                    href="/contact"
-                    aria-label="Contact"
-                    title="Contact"
-                    className="group relative flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-primary"
-                  >
-                    <svg
-                      className="h-5 w-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                      />
-                    </svg>
-
-                    <span className="absolute bottom-1 left-3 right-3 h-0.5 origin-left scale-x-0 bg-primary transition-transform duration-300 group-hover:scale-x-100" />
-                  </Link>
+                <IconNavLink href="/favorites" label="Favoris">
+                  <Heart className="h-5 w-5" aria-hidden="true" />
+                </IconNavLink>
+                <IconNavLink href="/cart" label="Panier">
+                  <ShoppingCart className="h-5 w-5" aria-hidden="true" />
+                </IconNavLink>
+                <IconNavLink href="/donation" label="Donation">
+                  <HandCoins className="h-5 w-5" aria-hidden="true" />
+                </IconNavLink>
+                <IconNavLink href="/contact" label="Contact">
+                  <Mail className="h-5 w-5" aria-hidden="true" />
+                </IconNavLink>
               </nav>
 
               {/* Auth Buttons */}
@@ -374,5 +365,27 @@ function SocialLink({ href, icon }: { href: string; icon: string }) {
     >
       {icons[icon as keyof typeof icons]}
     </a>
+  );
+}
+
+function IconNavLink({
+  href,
+  label,
+  children,
+}: {
+  href: string;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-label={label}
+      title={label}
+      className="group relative flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-primary"
+    >
+      {children}
+      <span className="absolute bottom-1 left-3 right-3 h-0.5 origin-left scale-x-0 bg-primary transition-transform duration-300 group-hover:scale-x-100" />
+    </Link>
   );
 }
