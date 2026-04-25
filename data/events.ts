@@ -1,4 +1,15 @@
-export const events = [
+export type EventItem = {
+  id: number;
+  title: string;
+  subtitle?: string;
+  date: string;
+  location?: string;
+  image: string;
+  link: string;
+  category?: string;
+};
+
+export const events: EventItem[] = [
   {
     id: 1,
     title: "Congrès 2026",

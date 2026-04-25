@@ -7,6 +7,7 @@ export interface Event {
   description: string;
   date: Date;
   lieu: string;
+  prix?: number;
   categoryId?: ObjectId | string;
   image?: string;
   createdAt: Date;

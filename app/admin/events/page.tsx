@@ -8,6 +8,7 @@ type EventItem = {
   description?: string;
   date?: string;
   lieu?: string;
+  prix?: number;
   categoryId?: string | { _id?: string; nom?: string } | null;
   image?: string;
   createdAt?: string;
@@ -20,11 +21,12 @@ type EventForm = {
   description: string;
   date: string;
   lieu: string;
+  prix: string;
   categoryId: string;
   image: string;
 };
 
-const initialForm: EventForm = { titre: "", description: "", date: "", lieu: "", categoryId: "", image: "" };
+const initialForm: EventForm = { titre: "", description: "", date: "", lieu: "", prix: "", categoryId: "", image: "" };
 const INPUT_CLS = "w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition";
 
 function toDateInputValue(v?: string) {
@@ -71,7 +73,13 @@ export default function AdminEventsPage() {
     finally { setLoading(false); }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void load();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   function reset() { setEditingId(null); setForm(initialForm); setError(""); setSuccess(""); if (fileRef.current) fileRef.current.value = ""; }
 
@@ -79,7 +87,7 @@ export default function AdminEventsPage() {
     const catId = typeof item.categoryId === "string" ? item.categoryId
       : item.categoryId && typeof item.categoryId === "object" ? String(item.categoryId._id || "") : "";
     setEditingId(item._id);
-    setForm({ titre: item.titre || "", description: item.description || "", date: toDateInputValue(item.date), lieu: item.lieu || "", categoryId: catId, image: item.image || "" });
+    setForm({ titre: item.titre || "", description: item.description || "", date: toDateInputValue(item.date), lieu: item.lieu || "", prix: item.prix ? String(item.prix) : "", categoryId: catId, image: item.image || "" });
     setError(""); setSuccess("");
   }
 
@@ -103,7 +111,7 @@ export default function AdminEventsPage() {
       const res = await fetch(url, {
         method: editingId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ titre: form.titre.trim(), description: form.description.trim(), date: form.date || null, lieu: form.lieu.trim(), categoryId: form.categoryId || null, image: form.image }),
+        body: JSON.stringify({ titre: form.titre.trim(), description: form.description.trim(), date: form.date || null, lieu: form.lieu.trim(), prix: Number(form.prix) || 0, categoryId: form.categoryId || null, image: form.image }),
       });
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.message || "Erreur");
@@ -157,6 +165,10 @@ export default function AdminEventsPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Lieu</label>
               <input value={form.lieu} onChange={(e) => set("lieu", e.target.value)} placeholder="Tunis, Hôtel XYZ…" className={INPUT_CLS} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Prix (TND)</label>
+              <input type="number" min="0" step="0.001" value={form.prix} onChange={(e) => set("prix", e.target.value)} placeholder="0 pour gratuit" className={INPUT_CLS} />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
@@ -227,7 +239,7 @@ export default function AdminEventsPage() {
                       {upcoming && <span className="rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">À venir</span>}
                     </div>
                     <p className="text-xs text-gray-500">
-                      {[item.lieu, catLabel(item), item.date ? new Date(item.date).toLocaleDateString("fr-FR") : null].filter(Boolean).join(" · ")}
+                      {[item.lieu, catLabel(item), item.date ? new Date(item.date).toLocaleDateString("fr-FR") : null, item.prix ? `${item.prix} TND` : "Gratuit"].filter(Boolean).join(" · ")}
                     </p>
                   </div>
                   <div className="flex gap-2 flex-shrink-0">

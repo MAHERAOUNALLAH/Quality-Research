@@ -1,4 +1,5 @@
 import Link from "next/link";
+import EventActionButtons from "./EventActionButtons";
 
 type EventItem = {
   _id: string;
@@ -6,6 +7,7 @@ type EventItem = {
   description: string;
   date: string;
   lieu: string;
+  prix?: number;
   categoryId?: string | { nom?: string } | null;
   image?: string;
   createdAt: string;
@@ -19,13 +21,26 @@ async function getEvents(): Promise<EventItem[]> {
     const res = await fetch(`${baseUrl}/api/events`, { cache: "no-store" });
     const data = await res.json();
     return Array.isArray(data) ? data : data.items || [];
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 }
 
-function isUpcoming(dateStr: string) { return new Date(dateStr) >= new Date(); }
+function isUpcoming(dateStr: string) {
+  return new Date(dateStr) >= new Date();
+}
 
 function catName(c: EventItem["categoryId"]) {
   return typeof c === "object" && c?.nom ? c.nom : null;
+}
+
+function formatPrice(prix?: number) {
+  if (!prix || prix <= 0) return "Gratuit";
+  return new Intl.NumberFormat("fr-TN", {
+    style: "currency",
+    currency: "TND",
+    maximumFractionDigits: 3,
+  }).format(prix);
 }
 
 export default async function EventsPage() {
@@ -35,39 +50,38 @@ export default async function EventsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero */}
-      <div className="relative overflow-hidden bg-white border-b border-gray-100">
-        <div className="absolute inset-0 bg-gradient-to-br from-lightgreen via-white to-white pointer-events-none" />
+      <div className="relative overflow-hidden border-b border-gray-100 bg-white">
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-lightgreen via-white to-white" />
         <div className="relative mx-auto max-w-7xl px-6 py-20">
-          <div className="flex items-center gap-2 mb-4">
+          <div className="mb-4 flex items-center gap-2">
             <span className="h-1 w-8 rounded-full bg-primary" />
             <p className="text-sm font-semibold uppercase tracking-widest text-primary">Agenda</p>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 md:text-5xl lg:text-6xl leading-tight">
-            Événements &amp; <br className="hidden sm:block" />
+          <h1 className="text-4xl font-bold leading-tight text-gray-900 md:text-5xl lg:text-6xl">
+            Evenements &amp; <br className="hidden sm:block" />
             <span className="text-primary">Rencontres</span>
           </h1>
-          <p className="mt-5 max-w-2xl text-lg text-gray-500 leading-relaxed">
-            Retrouvez nos congrès, ateliers, webinaires et rencontres scientifiques.
+          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-gray-500">
+            Retrouvez nos congres, ateliers, webinaires et rencontres scientifiques.
           </p>
           <div className="mt-6 flex items-center gap-6 text-sm text-gray-400">
             {upcoming.length > 0 && (
               <span className="flex items-center gap-1.5">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
-                {upcoming.length} à venir
+                {upcoming.length} a venir
               </span>
             )}
             {past.length > 0 && (
               <span className="flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full bg-gray-300" />
-                {past.length} passé{past.length !== 1 ? "s" : ""}
+                {past.length} passe{past.length !== 1 ? "s" : ""}
               </span>
             )}
           </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-14 space-y-16">
+      <div className="mx-auto max-w-7xl space-y-16 px-6 py-14">
         {events.length === 0 && (
           <div className="flex flex-col items-center justify-center py-28 text-center">
             <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-2xl bg-lightgreen shadow-sm">
@@ -75,16 +89,16 @@ export default async function EventsPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-gray-900">Aucun événement pour le moment</h3>
-            <p className="mt-2 text-gray-500">Les événements publiés apparaîtront ici.</p>
+            <h3 className="text-xl font-semibold text-gray-900">Aucun evenement pour le moment</h3>
+            <p className="mt-2 text-gray-500">Les evenements publies apparaitront ici.</p>
           </div>
         )}
 
         {upcoming.length > 0 && (
           <section>
-            <div className="flex items-center gap-3 mb-8">
-              <span className="inline-block h-3 w-3 rounded-full bg-green-500 animate-pulse" />
-              <h2 className="text-2xl font-bold text-gray-900">Événements à venir</h2>
+            <div className="mb-8 flex items-center gap-3">
+              <span className="inline-block h-3 w-3 animate-pulse rounded-full bg-green-500" />
+              <h2 className="text-2xl font-bold text-gray-900">Evenements a venir</h2>
               <span className="rounded-full bg-green-50 px-3 py-1 text-sm font-semibold text-green-700">{upcoming.length}</span>
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -95,11 +109,11 @@ export default async function EventsPage() {
 
         {past.length > 0 && (
           <section>
-            <div className="flex items-center gap-3 mb-8">
-              <h2 className="text-2xl font-bold text-gray-900">Événements passés</h2>
+            <div className="mb-8 flex items-center gap-3">
+              <h2 className="text-2xl font-bold text-gray-900">Evenements passes</h2>
               <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-500">{past.length}</span>
             </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 opacity-80">
+            <div className="grid gap-6 opacity-80 sm:grid-cols-2 lg:grid-cols-3">
               {past.map((e) => <EventCard key={e._id} event={e} upcoming={false} />)}
             </div>
           </section>
@@ -114,56 +128,64 @@ function EventCard({ event, upcoming }: { event: EventItem; upcoming: boolean })
   const d = new Date(event.date);
 
   return (
-    <Link
-      href={`/news/events/${event._id}`}
-      className={`group flex flex-col rounded-2xl bg-white shadow-sm border overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${upcoming ? "border-green-100" : "border-gray-100"}`}
-    >
-      {event.image ? (
-        <div className="relative h-48 w-full overflow-hidden">
-          <img src={event.image} alt={event.titre} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-          {upcoming && (
-            <div className="absolute top-3 left-3">
-              <span className="flex items-center gap-1.5 rounded-full bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-semibold text-green-700 shadow-sm">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
-                À venir
-              </span>
+    <article className={`group flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${upcoming ? "border-green-100" : "border-gray-100"}`}>
+      <Link href={`/news/events/${event._id}`} className="block">
+        {event.image ? (
+          <div className="relative h-48 w-full overflow-hidden">
+            <img src={event.image} alt={event.titre} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+            {upcoming && (
+              <div className="absolute left-3 top-3">
+                <span className="flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-green-700 shadow-sm backdrop-blur-sm">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
+                  A venir
+                </span>
+              </div>
+            )}
+            <div className="absolute right-3 top-3 rounded-full bg-white/95 px-3 py-1 text-xs font-black text-primary shadow-sm backdrop-blur-sm">
+              {formatPrice(event.prix)}
             </div>
-          )}
-          {/* Date badge overlaid on image */}
-          <div className="absolute bottom-3 right-3 rounded-xl bg-white/90 backdrop-blur-sm px-3 py-2 text-center shadow-sm">
-            <div className="text-xl font-black text-gray-900 leading-none">{d.getDate()}</div>
-            <div className="text-xs font-semibold uppercase text-primary tracking-wide">
-              {d.toLocaleDateString("fr-FR", { month: "short" })}
+            <div className="absolute bottom-3 right-3 rounded-xl bg-white/90 px-3 py-2 text-center shadow-sm backdrop-blur-sm">
+              <div className="text-xl font-black leading-none text-gray-900">{d.getDate()}</div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-primary">
+                {d.toLocaleDateString("fr-FR", { month: "short" })}
+              </div>
             </div>
           </div>
-        </div>
-      ) : (
-        <div className={`relative h-2 w-full ${upcoming ? "bg-gradient-to-r from-primary to-green-400" : "bg-gray-200"}`} />
-      )}
+        ) : (
+          <div className={`relative h-2 w-full ${upcoming ? "bg-gradient-to-r from-primary to-green-400" : "bg-gray-200"}`} />
+        )}
+      </Link>
 
       <div className="flex flex-1 flex-col p-6">
         <div className="mb-3 flex flex-wrap gap-2">
           {!event.image && upcoming && (
             <span className="flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
-              À venir
+              A venir
             </span>
           )}
           {cat && (
             <span className="rounded-full bg-lightgreen px-3 py-1 text-xs font-semibold text-primary">{cat}</span>
           )}
+          {!event.image && (
+            <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-primary ring-1 ring-primary/10">
+              {formatPrice(event.prix)}
+            </span>
+          )}
         </div>
 
-        <h2 className="mb-3 text-lg font-bold text-gray-900 group-hover:text-primary transition-colors leading-snug line-clamp-2">
-          {event.titre}
-        </h2>
-        <p className="mb-4 flex-1 text-sm leading-relaxed text-gray-500 line-clamp-3">{event.description}</p>
+        <Link href={`/news/events/${event._id}`} className="mb-3 block">
+          <h2 className="line-clamp-2 text-lg font-bold leading-snug text-gray-900 transition-colors group-hover:text-primary">
+            {event.titre}
+          </h2>
+        </Link>
+        <p className="mb-4 line-clamp-3 flex-1 text-sm leading-relaxed text-gray-500">{event.description}</p>
 
         <div className="mt-auto space-y-2 border-t border-gray-50 pt-4">
           {!event.image && (
             <div className="flex items-center gap-2 text-xs text-gray-500">
-              <svg className="h-3.5 w-3.5 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-3.5 w-3.5 flex-shrink-0 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               {d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
@@ -171,21 +193,34 @@ function EventCard({ event, upcoming }: { event: EventItem; upcoming: boolean })
           )}
           {event.lieu && (
             <div className="flex items-center gap-2 text-xs text-gray-500">
-              <svg className="h-3.5 w-3.5 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-3.5 w-3.5 flex-shrink-0 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
               {event.lieu}
             </div>
           )}
-          <div className="pt-1 flex items-center gap-1 text-xs font-semibold text-primary group-hover:gap-2 transition-all">
-            Voir les détails
+          <Link href={`/news/events/${event._id}`} className="inline-flex items-center gap-1 pt-1 text-xs font-semibold text-primary transition-all hover:gap-2">
+            Voir les details
             <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
+          </Link>
+          <div className="pt-2">
+            <EventActionButtons
+              compact
+              item={{
+                id: event._id,
+                titre: event.titre,
+                prix: event.prix,
+                image: event.image,
+                date: event.date,
+                lieu: event.lieu,
+              }}
+            />
           </div>
         </div>
       </div>
-    </Link>
+    </article>
   );
 }

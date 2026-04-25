@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import EventActionButtons from "../EventActionButtons";
 
 type Event = {
   _id: string;
@@ -7,6 +8,7 @@ type Event = {
   description: string;
   date: string;
   lieu: string;
+  prix?: number;
   image?: string;
   categoryId?: string;
   categoryName?: string;
@@ -44,6 +46,15 @@ async function getRelatedEvents(currentId: string): Promise<Event[]> {
 
 function isUpcoming(dateStr: string) {
   return new Date(dateStr) >= new Date();
+}
+
+function formatPrice(prix?: number) {
+  if (!prix || prix <= 0) return "Gratuit";
+  return new Intl.NumberFormat("fr-TN", {
+    style: "currency",
+    currency: "TND",
+    maximumFractionDigits: 3,
+  }).format(prix);
 }
 
 export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -102,6 +113,9 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                     {event.categoryName}
                   </span>
                 )}
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-primary ring-1 ring-primary/10">
+                  {formatPrice(event.prix)}
+                </span>
               </div>
 
               <h1 className="text-3xl font-bold text-gray-900 leading-snug md:text-4xl">{event.titre}</h1>
@@ -129,6 +143,13 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                     <span>{event.lieu}</span>
                   </div>
                 )}
+                <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                  <svg className="h-5 w-5 flex-shrink-0 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>{formatPrice(event.prix)}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -140,7 +161,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
         <div className="grid gap-10 lg:grid-cols-[1fr_280px]">
           {/* Main */}
           <article className="rounded-2xl bg-white border border-gray-100 p-8 shadow-sm">
-            <h2 className="text-xl font-bold text-gray-900 mb-5">À propos de l'événement</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-5">À propos de l&apos;événement</h2>
             <div>
               {paragraphs.map((p, i) => (
                 <p key={i} className="mb-5 text-gray-700 leading-relaxed text-base">{p}</p>
@@ -163,7 +184,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
             {/* Register CTA if upcoming */}
             {upcoming && (
               <div className="rounded-2xl bg-primary p-5 text-white shadow-md">
-                <h3 className="font-bold text-lg mb-2">S'inscrire</h3>
+                <h3 className="font-bold text-lg mb-2">S&apos;inscrire</h3>
                 <p className="text-green-100 text-xs leading-relaxed mb-4">
                   Places limitées — inscrivez-vous dès maintenant pour participer à cet événement.
                 </p>
@@ -173,6 +194,28 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                 </Link>
               </div>
             )}
+
+            <div className="rounded-2xl bg-white border border-gray-100 p-5 shadow-sm">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div>
+                  <h3 className="font-semibold text-gray-900">Reservation</h3>
+                  <p className="mt-1 text-xs text-gray-500">Ajoutez cet evenement a vos favoris ou a votre panier.</p>
+                </div>
+                <span className="rounded-full bg-lightgreen px-3 py-1 text-sm font-black text-primary">
+                  {formatPrice(event.prix)}
+                </span>
+              </div>
+              <EventActionButtons
+                item={{
+                  id: event._id,
+                  titre: event.titre,
+                  prix: event.prix,
+                  image: event.image,
+                  date: event.date,
+                  lieu: event.lieu,
+                }}
+              />
+            </div>
 
             {/* Details card */}
             <div className="rounded-2xl bg-white border border-gray-100 p-5 shadow-sm">
@@ -203,6 +246,16 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                     </div>
                   </li>
                 )}
+                <li className="flex items-start gap-3">
+                  <svg className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Prix</p>
+                    <p className="text-gray-800">{formatPrice(event.prix)}</p>
+                  </div>
+                </li>
                 {event.categoryName && (
                   <li className="flex items-start gap-3">
                     <svg className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import "./login.css";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
-const Login: React.FC = () => {
-  const router = useRouter();
+const LoginContent: React.FC = () => {
   const searchParams = useSearchParams();
 
   const [email, setEmail] = useState("");
@@ -155,6 +154,14 @@ const Login: React.FC = () => {
         </div>
       </main>
     </div>
+  );
+};
+
+const Login: React.FC = () => {
+  return (
+    <Suspense fallback={null}>
+      <LoginContent />
+    </Suspense>
   );
 };
 

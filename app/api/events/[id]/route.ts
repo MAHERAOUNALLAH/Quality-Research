@@ -43,6 +43,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
           description: body.description,
           date: body.date ? new Date(body.date) : new Date(),
           lieu: body.lieu,
+          prix: Number(body.prix) || 0,
           categoryId: body.categoryId || "",
           image: body.image || "",
           updatedAt: new Date(),
