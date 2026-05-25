@@ -38,13 +38,13 @@ async function getTeamMembers(): Promise<TeamMember[]> {
   try {
     const db = await getDb();
 
-    const docs = await db
-      .collection("team")
-      .find({
-        $or: [{ active: true }, { active: { $exists: false } }],
-      })
-      .sort({ order: 1, createdAt: -1 })
-      .toArray();
+  const docs = await db
+  .collection("teamMembers")
+  .find({
+    $or: [{ active: true }, { active: { $exists: false } }],
+  })
+  .sort({ order: 1, createdAt: -1 })
+  .toArray();
 
     return docs.map(normalizeTeamMember);
   } catch (error) {

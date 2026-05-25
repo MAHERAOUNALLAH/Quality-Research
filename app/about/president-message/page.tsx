@@ -49,7 +49,7 @@ export default function PresidentMessagePage() {
               Ensemble, faisons de la qualité une culture et de la recherche un réflexe.
             </p>
             <p className="text-right font-medium text-gray-700 mt-6">
-              Pr. Khaled Mbarek<br />
+              Pr. Tarek<br />
               <span className="text-primary">Président, Quality &amp; Research</span>
             </p>
           </div>
