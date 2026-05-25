@@ -1,4 +1,8 @@
 import Link from "next/link";
+import { getDb } from "@/lib/mongodb";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 type Article = {
   _id: string;
@@ -6,30 +10,80 @@ type Article = {
   contenu: string;
   excerpt?: string;
   categoryId?: string | { nom?: string } | null;
+  categoryName?: string;
   image?: string;
   createdAt: string;
+  published?: boolean;
 };
+
+function normalizeArticle(doc: any): Article {
+  return {
+    _id: String(doc._id),
+    titre: doc.titre || doc.title || "",
+    contenu: doc.contenu || doc.content || "",
+    excerpt: doc.excerpt || "",
+    categoryId: doc.categoryId || null,
+    categoryName: doc.categoryName || "",
+    image: doc.image || "",
+    published: doc.published,
+    createdAt:
+      doc.createdAt instanceof Date
+        ? doc.createdAt.toISOString()
+        : String(doc.createdAt || ""),
+  };
+}
 
 async function getArticles(): Promise<Article[]> {
   try {
-    const baseUrl =
-      process.env.NEXT_PUBLIC_BASE_URL ||
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
-    const res = await fetch(`${baseUrl}/api/articles`, { cache: "no-store" });
-    const data = await res.json();
-    return Array.isArray(data) ? data : data.items || [];
-  } catch { return []; }
+    const db = await getDb();
+
+    const docs = await db
+      .collection("articles")
+      .find({
+        $or: [{ published: true }, { published: { $exists: false } }],
+      })
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    return docs.map(normalizeArticle);
+  } catch (error) {
+    console.error("Failed to load articles from MongoDB:", error);
+    return [];
+  }
 }
 
 function excerpt(text: string, max = 150) {
   if (!text) return "";
-  return text.length > max ? text.slice(0, max).trimEnd() + "…" : text;
+
+  const clean = text.replace(/\s+/g, " ").trim();
+
+  return clean.length > max ? clean.slice(0, max).trimEnd() + "…" : clean;
 }
 
-function categoryLabel(cat: Article["categoryId"]) {
+function categoryLabel(article: Article) {
+  if (article.categoryName) return article.categoryName;
+
+  const cat = article.categoryId;
+
   if (!cat) return null;
+
   if (typeof cat === "object" && cat.nom) return cat.nom;
+
   return null;
+}
+
+function formatDate(dateStr: string) {
+  const date = new Date(dateStr);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return date.toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 }
 
 export default async function ArticlesPage() {
@@ -40,22 +94,30 @@ export default async function ArticlesPage() {
       {/* Hero */}
       <div className="relative overflow-hidden bg-white border-b border-gray-100">
         <div className="absolute inset-0 bg-gradient-to-br from-lightgreen via-white to-white pointer-events-none" />
+
         <div className="relative mx-auto max-w-7xl px-6 py-20">
           <div className="flex items-center gap-2 mb-4">
             <span className="h-1 w-8 rounded-full bg-primary" />
-            <p className="text-sm font-semibold uppercase tracking-widest text-primary">Publications</p>
+            <p className="text-sm font-semibold uppercase tracking-widest text-primary">
+              Publications
+            </p>
           </div>
+
           <h1 className="text-4xl font-bold text-gray-900 md:text-5xl lg:text-6xl leading-tight">
             Articles &amp; <br className="hidden sm:block" />
             <span className="text-primary">Recherches</span>
           </h1>
+
           <p className="mt-5 max-w-2xl text-lg text-gray-500 leading-relaxed">
-            Découvrez nos dernières publications scientifiques, analyses et études sur la qualité et la recherche en santé.
+            Découvrez nos dernières publications scientifiques, analyses et
+            études sur la qualité et la recherche en santé.
           </p>
+
           <div className="mt-6 flex items-center gap-6 text-sm text-gray-400">
             <span className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-primary" />
-              {articles.length} article{articles.length !== 1 ? "s" : ""} publié{articles.length !== 1 ? "s" : ""}
+              {articles.length} article{articles.length !== 1 ? "s" : ""}{" "}
+              publié{articles.length !== 1 ? "s" : ""}
             </span>
           </div>
         </div>
@@ -65,18 +127,37 @@ export default async function ArticlesPage() {
         {articles.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-28 text-center">
             <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-2xl bg-lightgreen shadow-sm">
-              <svg className="h-10 w-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <svg
+                className="h-10 w-10 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-gray-900">Aucun article pour le moment</h3>
-            <p className="mt-2 text-gray-500">Les articles publiés apparaîtront ici.</p>
+
+            <h3 className="text-xl font-semibold text-gray-900">
+              Aucun article pour le moment
+            </h3>
+
+            <p className="mt-2 text-gray-500">
+              Les articles publiés apparaîtront ici.
+            </p>
           </div>
         ) : (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {articles.map((article) => {
-              const cat = categoryLabel(article.categoryId);
+              const cat = categoryLabel(article);
+              const dateLabel = formatDate(article.createdAt);
+              const articleExcerpt =
+                article.excerpt || excerpt(article.contenu);
+
               return (
                 <Link
                   key={article._id}
@@ -85,7 +166,12 @@ export default async function ArticlesPage() {
                 >
                   {article.image ? (
                     <div className="relative h-52 w-full overflow-hidden">
-                      <img src={article.image} alt={article.titre} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                      <img
+                        src={article.image}
+                        alt={article.titre}
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                      />
+
                       <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
                   ) : (
@@ -99,25 +185,43 @@ export default async function ArticlesPage() {
                           {cat}
                         </span>
                       )}
-                      <span className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-500">
-                        {new Date(article.createdAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
-                      </span>
+
+                      {dateLabel && (
+                        <span className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-500">
+                          {dateLabel}
+                        </span>
+                      )}
                     </div>
 
                     <h2 className="mb-3 text-xl font-bold text-gray-900 group-hover:text-primary transition-colors leading-snug line-clamp-2">
                       {article.titre}
                     </h2>
 
-                    <p className="flex-1 text-sm leading-relaxed text-gray-500 line-clamp-3">
-                      {article.excerpt || excerpt(article.contenu)}
-                    </p>
+                    {articleExcerpt && (
+                      <p className="flex-1 text-sm leading-relaxed text-gray-500 line-clamp-3">
+                        {articleExcerpt}
+                      </p>
+                    )}
 
                     <div className="mt-5 flex items-center justify-between border-t border-gray-50 pt-4">
-                      <span className="text-xs text-gray-400">Quality &amp; Research</span>
+                      <span className="text-xs text-gray-400">
+                        Quality &amp; Research
+                      </span>
+
                       <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary group-hover:gap-2 transition-all">
                         Lire
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17 8l4 4m0 0l-4 4m4-4H3"
+                          />
                         </svg>
                       </span>
                     </div>
