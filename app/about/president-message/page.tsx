@@ -14,7 +14,7 @@ export default function PresidentMessagePage() {
               M
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Pr. Khaled Mbarek</h2>
+              <h2 className="text-xl font-bold text-gray-900">Pr. Tarek</h2>
               <p className="text-primary font-medium">Président de Quality &amp; Research</p>
             </div>
           </div>

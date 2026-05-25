@@ -1,3 +1,8 @@
+import { getDb } from "@/lib/mongodb";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 type TeamMember = {
   _id: string;
   name: string;
@@ -8,18 +13,42 @@ type TeamMember = {
   email: string;
   order: number;
   active: boolean;
+  createdAt?: string;
 };
+
+function normalizeTeamMember(doc: any): TeamMember {
+  return {
+    _id: String(doc._id),
+    name: doc.name || "",
+    role: doc.role || "",
+    specialty: doc.specialty || "",
+    bio: doc.bio || "",
+    photo: doc.photo || "",
+    email: doc.email || "",
+    order: typeof doc.order === "number" ? doc.order : 999,
+    active: doc.active !== false,
+    createdAt:
+      doc.createdAt instanceof Date
+        ? doc.createdAt.toISOString()
+        : String(doc.createdAt || ""),
+  };
+}
 
 async function getTeamMembers(): Promise<TeamMember[]> {
   try {
-    const baseUrl =
-      process.env.NEXT_PUBLIC_BASE_URL ||
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
-    const res = await fetch(`${baseUrl}/api/team`, { cache: "no-store" });
-    const data = await res.json();
-    const list: TeamMember[] = Array.isArray(data) ? data : data.items || [];
-    return list.filter((m) => m.active !== false);
-  } catch {
+    const db = await getDb();
+
+    const docs = await db
+      .collection("team")
+      .find({
+        $or: [{ active: true }, { active: { $exists: false } }],
+      })
+      .sort({ order: 1, createdAt: -1 })
+      .toArray();
+
+    return docs.map(normalizeTeamMember);
+  } catch (error) {
+    console.error("Failed to load team members from MongoDB:", error);
     return [];
   }
 }
@@ -29,7 +58,7 @@ function initials(name: string) {
     .split(" ")
     .filter(Boolean)
     .slice(-2)
-    .map((w) => w[0])
+    .map((word) => word[0])
     .join("")
     .toUpperCase();
 }
@@ -41,12 +70,26 @@ export default async function TeamPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-100">
         <div className="mx-auto max-w-7xl px-6 py-16">
-          <p className="text-sm font-semibold uppercase tracking-wider text-primary">À propos</p>
-          <h1 className="mt-2 text-4xl font-bold text-gray-900 md:text-5xl">Notre équipe</h1>
-          <p className="mt-4 max-w-2xl text-gray-600">
-            Une équipe pluridisciplinaire de professionnels engagés pour la promotion de la qualité
-            et de la recherche en santé.
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary">
+            À propos
           </p>
+
+          <h1 className="mt-2 text-4xl font-bold text-gray-900 md:text-5xl">
+            Notre équipe
+          </h1>
+
+          <p className="mt-4 max-w-2xl text-gray-600">
+            Une équipe pluridisciplinaire de professionnels engagés pour la
+            promotion de la qualité et de la recherche en santé.
+          </p>
+
+          {team.length > 0 && (
+            <div className="mt-6 flex items-center gap-2 text-sm text-gray-400">
+              <span className="h-2 w-2 rounded-full bg-primary" />
+              {team.length} membre{team.length !== 1 ? "s" : ""} affiché
+              {team.length !== 1 ? "s" : ""}
+            </div>
+          )}
         </div>
       </div>
 
@@ -54,13 +97,28 @@ export default async function TeamPage() {
         {team.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-lightgreen">
-              <svg className="h-8 w-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+              <svg
+                className="h-8 w-8 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
+                />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900">Équipe non disponible</h3>
-            <p className="mt-1 text-sm text-gray-500">Les membres de l'équipe apparaîtront ici.</p>
+
+            <h3 className="text-lg font-semibold text-gray-900">
+              Équipe non disponible
+            </h3>
+
+            <p className="mt-1 text-sm text-gray-500">
+              Les membres de l&apos;équipe apparaîtront ici.
+            </p>
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -80,14 +138,29 @@ export default async function TeamPage() {
                     {initials(member.name)}
                   </div>
                 )}
-                <h3 className="font-bold text-gray-900 text-lg">{member.name}</h3>
-                <p className="text-primary font-medium text-sm mt-1">{member.role}</p>
-                <p className="text-gray-500 text-xs mt-2 leading-relaxed">{member.specialty}</p>
+
+                <h3 className="font-bold text-gray-900 text-lg">
+                  {member.name}
+                </h3>
+
+                {member.role && (
+                  <p className="text-primary font-medium text-sm mt-1">
+                    {member.role}
+                  </p>
+                )}
+
+                {member.specialty && (
+                  <p className="text-gray-500 text-xs mt-2 leading-relaxed">
+                    {member.specialty}
+                  </p>
+                )}
+
                 {member.bio && (
                   <p className="mt-3 text-gray-600 text-xs leading-relaxed line-clamp-3 border-t border-gray-50 pt-3">
                     {member.bio}
                   </p>
                 )}
+
                 {member.email && (
                   <a
                     href={`mailto:${member.email}`}
