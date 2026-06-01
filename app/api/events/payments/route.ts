@@ -4,6 +4,26 @@ import { ObjectId } from "mongodb";
 import { getDb } from "@/lib/mongodb";
 import { verifyToken } from "@/lib/auth";
 
+type UserDoc = {
+  _id?: ObjectId;
+  fullName?: string;
+  nom?: string;
+  prenom?: string;
+  email?: string;
+};
+
+function getUserName(user?: UserDoc | null) {
+  const fullName = user?.fullName?.trim();
+  if (fullName) return fullName;
+
+  const composedName = [user?.prenom, user?.nom]
+    .map((part) => part?.trim())
+    .filter(Boolean)
+    .join(" ");
+
+  return composedName || user?.email || "Utilisateur";
+}
+
 async function getUserId() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
@@ -62,9 +82,10 @@ export async function POST(req: Request) {
 
     const db = await getDb();
     const eventObjectId = new ObjectId(eventId);
-    const [event, cartItem] = await Promise.all([
+    const [event, cartItem, user] = await Promise.all([
       db.collection("events").findOne({ _id: eventObjectId }),
       db.collection("eventCart").findOne({ userId, eventId: eventObjectId }),
+      db.collection<UserDoc>("users").findOne({ _id: userId }),
     ]);
 
     if (!event) {
@@ -97,6 +118,26 @@ export async function POST(req: Request) {
     };
 
     const result = await db.collection("payments").insertOne(payment);
+    await db.collection("eventRegistrations").updateOne(
+      { userId, eventId: eventObjectId },
+      {
+        $setOnInsert: {
+          userId,
+          eventId: eventObjectId,
+          eventTitle: event.titre || "",
+          eventPrice: amount,
+          userName: getUserName(user),
+          userEmail: user?.email || "",
+          createdAt: now,
+        },
+        $set: {
+          status: payment.status,
+          paidAt: now,
+          updatedAt: now,
+        },
+      },
+      { upsert: true }
+    );
     await db.collection("eventCart").deleteOne({ _id: cartItem._id });
 
     return NextResponse.json({

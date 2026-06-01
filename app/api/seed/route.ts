@@ -22,6 +22,7 @@ export async function GET(req: Request) {
       db.collection("events").deleteMany({}),
       db.collection("eventFavorites").deleteMany({}),
       db.collection("eventCart").deleteMany({}),
+      db.collection("eventRegistrations").deleteMany({}),
       db.collection("payments").deleteMany({}),
       db.collection("calls").deleteMany({}),
       db.collection("projects").deleteMany({}),

@@ -15,6 +15,7 @@ const LoginContent: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
     const registered = searchParams.get("registered");
     const emailFromQuery = searchParams.get("email");
 
@@ -25,6 +26,9 @@ const LoginContent: React.FC = () => {
     if (registered === "1") {
       setSuccessMessage("Inscription réussie. Vous pouvez maintenant vous connecter.");
     }
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,7 +57,9 @@ const LoginContent: React.FC = () => {
         return;
       }
 
-      window.location.href = "/";
+      const from = searchParams.get("from");
+      window.location.href =
+        from && from.startsWith("/") && !from.startsWith("//") ? from : "/";
     } catch (error) {
       console.error("LOGIN FETCH ERROR:", error);
       setError("Erreur réseau. Réessayez.");

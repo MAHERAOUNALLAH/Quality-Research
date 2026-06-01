@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Check, Heart, ShoppingCart } from "lucide-react";
+import EventParticipationButton from "./EventParticipationButton";
 
 export type EventActionItem = {
   id: string;
@@ -88,9 +89,11 @@ async function toggleMongoItem(eventId: string, type: "favorite" | "cart") {
 export default function EventActionButtons({
   item,
   compact = false,
+  participationEnabled = false,
 }: {
   item: EventActionItem;
   compact?: boolean;
+  participationEnabled?: boolean;
 }) {
   const [favorite, setFavorite] = useState(false);
   const [inCart, setInCart] = useState(false);
@@ -155,11 +158,13 @@ export default function EventActionButtons({
   }
 
   const buttonBase = compact
-    ? "inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-bold transition"
-    : "inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition";
+    ? "inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-bold transition"
+    : "inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition";
+  const columns = participationEnabled && !compact ? "grid-cols-3" : "grid-cols-2";
+  const participationClass = compact ? `${buttonBase} col-span-2` : buttonBase;
 
   return (
-    <div className="flex w-full gap-2">
+    <div className={`grid w-full gap-2 ${columns}`}>
       <button
         type="button"
         onClick={() => handleToggle("favorite")}
@@ -195,6 +200,14 @@ export default function EventActionButtons({
         )}
         {inCart ? "Au panier" : "Panier"}
       </button>
+
+      {participationEnabled && (
+        <EventParticipationButton
+          compact={compact}
+          eventId={item.id}
+          className={participationClass}
+        />
+      )}
     </div>
   );
 }

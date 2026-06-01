@@ -369,6 +369,7 @@ function EventCard({
           <div className="pt-2">
             <EventActionButtons
               compact
+              participationEnabled={upcoming}
               item={{
                 id: event._id,
                 titre: event.titre,

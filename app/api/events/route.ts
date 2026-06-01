@@ -5,7 +5,21 @@ import { requireAdmin } from "@/lib/requireAdmin";
 export async function GET() {
   try {
     const col = await getEventsCollection();
-    const items = await col.find({}).sort({ date: -1 }).toArray();
+    const items = await col
+      .aggregate([
+        { $sort: { date: -1 } },
+        {
+          $lookup: {
+            from: "eventRegistrations",
+            localField: "_id",
+            foreignField: "eventId",
+            as: "registrations",
+          },
+        },
+        { $addFields: { registrationCount: { $size: "$registrations" } } },
+        { $project: { registrations: 0 } },
+      ])
+      .toArray();
     return NextResponse.json({ ok: true, items });
   } catch {
     return NextResponse.json({ ok: false, message: "Failed to fetch events" }, { status: 500 });

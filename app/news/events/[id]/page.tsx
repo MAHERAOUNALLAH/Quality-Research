@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ObjectId } from "mongodb";
 import EventActionButtons from "../EventActionButtons";
+import EventParticipationButton from "../EventParticipationButton";
 import { getEventsCollection } from "@/lib/models/Event";
 
 export const dynamic = "force-dynamic";
@@ -356,12 +357,10 @@ export default async function EventDetailPage({
                   participer à cet événement.
                 </p>
 
-                <Link
-                  href="/contact"
-                  className="block w-full rounded-xl bg-white py-2.5 text-center text-sm font-semibold text-primary hover:bg-green-50 transition"
-                >
-                  Demander une inscription
-                </Link>
+                <EventParticipationButton
+                  eventId={event._id}
+                  surface="onPrimary"
+                />
               </div>
             )}
 

@@ -64,7 +64,15 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
 
     const { id } = await params;
     const col = await getEventsCollection();
-    await col.deleteOne({ _id: new ObjectId(id) });
+    const eventId = new ObjectId(id);
+    await col.deleteOne({ _id: eventId });
+
+    const db = await getDb();
+    await Promise.all([
+      db.collection("eventRegistrations").deleteMany({ eventId }),
+      db.collection("eventFavorites").deleteMany({ eventId }),
+      db.collection("eventCart").deleteMany({ eventId }),
+    ]);
 
     return NextResponse.json({ ok: true });
   } catch {
