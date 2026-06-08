@@ -2,6 +2,7 @@ import Link from "next/link";
 import "./globals.css";
 import Image from "next/image";
 import NavbarAuth from "./components/NavbarAuth";
+import MobileNav from "./components/MobileNav";
 import { HandCoins, Heart, Mail, ShoppingCart } from "lucide-react";
 
 export const metadata = {
@@ -116,21 +117,7 @@ export default function RootLayout({
               </div>
 
               {/* Mobile Menu Button */}
-              <button className="rounded-lg p-2 text-primary transition-colors hover:bg-lightgreen md:hidden">
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-              </button>
+              <MobileNav />
             </div>
           </div>
         </header>

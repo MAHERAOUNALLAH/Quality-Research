@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { ObjectId } from "mongodb";
 import { isAdminRole, verifyToken } from "@/lib/auth";
 import { getDb } from "@/lib/mongodb";
-import AdminSidebar from "./_components/AdminSidebar";
+import AdminLayoutClient from "./_components/AdminLayoutClient";
 
 async function getCurrentUser(token: string) {
   try {
@@ -28,11 +28,8 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   if (!isAdminRole(user.role)) redirect("/");
 
   return (
-    <div className="flex min-h-screen bg-[#f6fbf8]">
-      <AdminSidebar email={user.email} role={user.role} />
-      <main className="flex-1 overflow-y-auto p-8">
-        {children}
-      </main>
-    </div>
+    <AdminLayoutClient email={user.email} role={user.role}>
+      {children}
+    </AdminLayoutClient>
   );
 }

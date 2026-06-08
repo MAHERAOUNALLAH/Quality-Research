@@ -50,9 +50,11 @@ function isActive(pathname: string, href: string) {
 export default function AdminSidebar({
   email,
   role,
+  onClose,
 }: {
   email: string;
   role?: string;
+  onClose?: () => void;
 }) {
   const pathname = usePathname();
 
@@ -89,6 +91,7 @@ export default function AdminSidebar({
               <Link
                 key={link.href}
                 href={link.href}
+                onClick={onClose}
                 className={[
                   "group relative flex min-h-11 items-center gap-3 rounded-2xl px-3 py-2.5 text-base font-bold transition-all",
                   active
@@ -125,6 +128,7 @@ export default function AdminSidebar({
       <div className="border-t border-green-100 p-4">
         <Link
           href="/"
+          onClick={onClose}
           className="flex min-h-11 items-center gap-3 rounded-2xl border border-green-100 bg-lightgreen px-3 py-2.5 text-base font-bold text-primary transition hover:border-primary hover:bg-white"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-primary">
